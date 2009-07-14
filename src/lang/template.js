@@ -86,7 +86,7 @@
  *  constructs:
  *
  *      // matches symbols like '<&#38;= field %>'
- *      var syntax = /(^|.|\r|\n)(\<%=\s*(\w+)\s*%\>)/;
+ *      var syntax = /\\?\<%=\s*(\w+)\s*%\>/g;
  *
  *      var t = new Template(
  *       '<div>Name: <b><&#38;= name %></b>, Age: <b><&#38;=age%></b></div>',
@@ -94,16 +94,20 @@
  *      t.evaluate( {name: 'John Smith', age: 26} );
  *      // -> <div>Name: <b>John Smith</b>, Age: <b>26</b></div>
  *
- *  There are important constraints to any custom syntax. Any syntax must
- *  provide at least three groupings in the regular expression. The first
- *  grouping is to capture what comes before the symbol, to detect the backslash
- *  escape character (no, you cannot use a different character). The second
- *  grouping captures the entire symbol and will be completely replaced upon
- *  evaluation. Lastly, the third required grouping captures the name of the
- *  field inside the symbol.
+ *  There are important constraints to any custom syntax. Any syntax must be a
+ *  global regular expression starting with an eventual backslash escape character
+ *  (no, you cannot use a different character) and containing a group capturing the
+ *  name of the field inside the symbol.
+ *
+ *  <h5>Backward compatilibility</h5>
+ *
+ *  Old style syntaxes are still supported but deprecated and will be removed in
+ *  future releases:
+ *
+ *      var oldSyntax = /(^|.|\r|\n)(\<%=\s*(\w+)\s*%\>)/;
  *
 **/
-var Template = Class.create({
+var Template = Class.create((function() {
   /**
    *  new Template(template[, pattern = Template.Pattern])
    *
@@ -112,10 +116,10 @@ var Template = Class.create({
    *  The optional `pattern` argument expects a `RegExp` that defines a custom
    *  syntax for the replaceable symbols in `template`.
   **/
-  initialize: function(template, pattern) {
+  function initialize(template, pattern) {
     this.template = template.toString();
-    this.pattern = pattern || Template.Pattern;
-  },
+    this.pattern = formatPattern(pattern || Template.Pattern);
+  }
 
   /**
    *  Template#evaluate(object) -> String
@@ -123,31 +127,33 @@ var Template = Class.create({
    *  Applies the template to `object`'s data, producing a formatted string
    *  with symbols replaced by `object`'s corresponding properties.
   **/
-  evaluate: function(object) {
+  function evaluate(object) {
     if (object && Object.isFunction(object.toTemplateReplacements))
       object = object.toTemplateReplacements();
 
-    return this.template.gsub(this.pattern, function(match) {
-      if (object == null) return (match[1] + '');
-
-      var before = match[1] || '';
-      if (before == '\\') return match[2];
-
-      var ctx = object, expr = match[3];
-      var pattern = /^([^.[]+|\[((?:.*?[^\\])?)\])(\.|\[|$)/;
-      match = pattern.exec(expr);
-      if (match == null) return before;
-
-      while (match != null) {
-        var comp = match[1].startsWith('[') ? match[2].replace(/\\\\]/g, ']') : match[1];
-        ctx = ctx[comp];
-        if (null == ctx || '' == match[3]) break;
-        expr = expr.substring('[' == match[3] ? match[1].length : match[0].length);
-        match = pattern.exec(expr);
-      }
-
-      return before + String.interpret(ctx);
+    return this.template.replace(this.pattern, function(interpolation, expr) {
+      if (interpolation.charAt(0) === '\\') return interpolation.slice(1);
+      if (object == null) return '';
+      
+      var result = expr.split(/\.|\[|\]/).inject(object, function(ctx, property) {
+        return property.length ? ctx[property] : ctx;
+      });
+      
+      return result === object ? '' : String.interpret(result);
     });
   }
-});
-Template.Pattern = /(^|.|\r|\n)(#\{(.*?)\})/;
+
+  // Backward-compatibility with 1.6 syntax
+  function formatPattern(pattern) {
+    if (pattern.global) return pattern;
+    var source = pattern.source.replace('(^|.|\\r|\\n)', '\\\\?').replace(/\((.*)\)/, '$1');
+    return new RegExp(source, 'g');
+  }
+
+  return {
+    initialize: initialize,
+    evaluate:   evaluate
+  };
+})());
+
+Template.Pattern = /\\?#\{(.*?)\}/g;

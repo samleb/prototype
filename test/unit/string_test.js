@@ -324,21 +324,16 @@ new Test.Unit.Runner({
   },
 
   testTemplateEvaluationWithIndexing: function() {
-    var source = '#{0} = #{[0]} - #{1} = #{[1]} - #{[2][0]} - #{[2].name} - #{first[0]} - #{[first][0]} - #{[\]]} - #{first[\]]}';
+    var source = '#{0} = #{[0]} - #{1} = #{[1]} - #{[2][0]} - #{[2].name} - #{first[0]} - #{[first][0]}';
     var subject = [ 'zero', 'one', [ 'two-zero' ] ];
     subject[2].name = 'two-zero-name';
     subject.first = subject[2];
-    subject[']'] = '\\';
-    subject.first[']'] = 'first\\';
     this.assertEqual('zero', new Template('#{[0]}').evaluate(subject), "#{[0]}");
     this.assertEqual('one', new Template('#{[1]}').evaluate(subject), "#{[1]}");
     this.assertEqual('two-zero', new Template('#{[2][0]}').evaluate(subject), '#{[2][0]}');
     this.assertEqual('two-zero-name', new Template('#{[2].name}').evaluate(subject), '#{[2].name}');
     this.assertEqual('two-zero', new Template('#{first[0]}').evaluate(subject), '#{first[0]}');
-    this.assertEqual('\\', new Template('#{[\]]}').evaluate(subject), '#{[\]]}');
-    this.assertEqual('first\\', new Template('#{first[\]]}').evaluate(subject), '#{first[\]]}');
-    this.assertEqual('empty - empty2', new Template('#{[]} - #{m[]}').evaluate({ '': 'empty', m: {'': 'empty2'}}), '#{[]} - #{m[]}');
-    this.assertEqual('zero = zero - one = one - two-zero - two-zero-name - two-zero - two-zero - \\ - first\\', new Template(source).evaluate(subject));
+    this.assertEqual('zero = zero - one = one - two-zero - two-zero-name - two-zero - two-zero', new Template(source).evaluate(subject));
   },
 
   testTemplateToTemplateReplacements: function() {
@@ -372,8 +367,16 @@ new Test.Unit.Runner({
 
   testInterpolate: function() {
     var subject = { name: 'Stephan' };
-    var pattern = /(^|.|\r|\n)(#\((.*?)\))/;
+    var pattern = /\\?#\((.*?)\)/g;
+    
     this.assertEqual('#{name}: Stephan', '\\#{name}: #{name}'.interpolate(subject));
+    this.assertEqual('#(name): Stephan', '\\#(name): #(name)'.interpolate(subject, pattern));
+    
+    this.assertEqual('foobar', '#{a}#{b}'.interpolate({a: 'foo', b: 'bar'}), "adjacent regexps");
+    this.assertEqual('#{b}', '#{a}\\#{b}'.interpolate(), "null object");
+    
+    // 1.6 non-global syntax backward compatibility test
+    pattern = /(^|.|\r|\n)(#\((.*?)\))/;
     this.assertEqual('#(name): Stephan', '\\#(name): #(name)'.interpolate(subject, pattern));
   },
 
