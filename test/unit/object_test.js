@@ -1,3 +1,6 @@
+var DONT_ENUM_PROPERTIES = $w('constructor toString toLocaleString valueOf hasOwnProperty ' +
+   'isPrototypeOf propertyIsEnumerable');
+
 new Test.Unit.Runner({
   testObjectExtend: function() {
     var object = {foo: 'foo', bar: [1, 2, 3]};
@@ -7,10 +10,41 @@ new Test.Unit.Runner({
     this.assertHashEqual({foo: 'foo', bar: [1, 2, 3], bla: 123}, object);
     this.assertHashEqual({foo: 'foo', bar: [1, 2, 3], bla: null},
       Object.extend(object, {bla: null}));
+    DONT_ENUM_PROPERTIES.each(function(property) {
+      object[property] = true;
+      object = Object.extend({}, object);
+      this.assert(object[property]);
+    }, this);
   },
 
   testObjectToQueryString: function() {
     this.assertEqual('a=A&b=B&c=C&d=D%23', Object.toQueryString({a: 'A', b: 'B', c: 'C', d: 'D#'}));
+  },
+
+  testObjectKeys: function() {
+    var object = {
+      foo: "foo",
+      "undefined": undefined,
+      "π": 3.14
+    };
+    DONT_ENUM_PROPERTIES.each(function(property) {
+      object[property] = property;
+    });
+    this.assertEnumEqual(DONT_ENUM_PROPERTIES.concat("foo", "undefined", "π").sort(),
+      Object.keys(object).sort());
+  },
+  
+  testObjectValues: function() {
+    var object = {
+      foo: "foo",
+      "undefined": undefined,
+      "π": 3.14
+    };
+    DONT_ENUM_PROPERTIES.each(function(property) {
+      object[property] = property;
+    });
+    this.assertEnumEqual(DONT_ENUM_PROPERTIES.concat("foo", undefined, 3.14).sort(),
+      Object.values(object).sort());
   },
 
   testObjectClone: function() {

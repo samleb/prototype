@@ -10,7 +10,22 @@
 **/
 (function() {
 
-  var _toString = Object.prototype.toString;
+  var _toString = Object.prototype.toString,
+      _hasOwnProperty = Object.prototype.hasOwnProperty;
+
+  var DONT_ENUM_PROPERTIES = ['constructor', 'toString', 'toLocaleString', 'valueOf',
+        'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable'],
+      DONT_ENUM_BUGGY = true;
+
+  for (var property in { toString: 1 })
+    DONT_ENUM_BUGGY = false;
+
+  function iterateOverDontEnumProperties(object, iterator) {
+    if (object == null) return;
+    for (var property, i = 0; property = DONT_ENUM_PROPERTIES[i]; i++)
+      if (_hasOwnProperty.call(object, property))
+        iterator(property, object[property]);
+  }
 
   /**
    *  Object.extend(destination, source) -> Object
@@ -23,6 +38,13 @@
   function extend(destination, source) {
     for (var property in source)
       destination[property] = source[property];
+
+    if (DONT_ENUM_BUGGY) {
+      iterateOverDontEnumProperties(source, function(property, value) {
+        destination[property] = value;
+      });
+    }
+
     return destination;
   }
 
@@ -138,8 +160,16 @@
   **/
   function keys(object) {
     var results = [];
+
     for (var property in object)
       results.push(property);
+
+    if (DONT_ENUM_BUGGY) {
+      iterateOverDontEnumProperties(object, function(property, value) {
+        results.push(property);
+      });
+    }
+
     return results;
   }
 
@@ -158,8 +188,16 @@
   **/
   function values(object) {
     var results = [];
+
     for (var property in object)
       results.push(object[property]);
+
+    if (DONT_ENUM_BUGGY) {
+      iterateOverDontEnumProperties(object, function(property, value) {
+        results.push(value);
+      });
+    }
+
     return results;
   }
 
