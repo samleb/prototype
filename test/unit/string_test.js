@@ -16,7 +16,7 @@ new Test.Unit.Runner({
 
   testGsubWithReplacementFunction: function() {
     var source = 'foo boo boz';
-    
+
     this.assertEqual('Foo Boo BoZ',
       source.gsub(/[^o]+/, function(match) {
         return match[0].toUpperCase()
@@ -29,7 +29,14 @@ new Test.Unit.Runner({
       source.gsub(/o+/, function(match) {
         return match[0].length % 2;
       }));
-
+    this.assertEqual('f1 b5 b9z',
+      source.gsub(/o+/, function(match) {
+        return match.index;
+      }));
+    this.assertEqual('foo boo bofoo boo boz',
+      source.gsub(/.$/, function(match) {
+        return match.input;
+      }));
   },
   
   testGsubWithReplacementString: function() {

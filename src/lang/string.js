@@ -44,27 +44,23 @@ Object.extend(String.prototype, (function() {
    *  The pattern can be a string or a regular expression.
   **/
   function gsub(pattern, replacement) {
-    var result = '', source = this, match;
+    var flags = 'g';
     replacement = prepareReplacement(replacement);
 
-    if (Object.isString(pattern))
-      pattern = RegExp.escape(pattern);
-
-    if (!(pattern.length || pattern.source)) {
-      replacement = replacement('');
-      return replacement + source.split('').join(replacement) + replacement;
+    if (Object.isString(pattern)) {
+      pattern = new RegExp(RegExp.escape(pattern), flags);
+    } else if (!pattern.global) {
+      if (pattern.multiline)  flags += 'm';
+      if (pattern.ignoreCase) flags += 'i';
+      pattern = new RegExp(pattern.source, flags);
     }
 
-    while (source.length > 0) {
-      if (match = source.match(pattern)) {
-        result += source.slice(0, match.index);
-        result += String.interpret(replacement(match));
-        source  = source.slice(match.index + match[0].length);
-      } else {
-        result += source, source = '';
-      }
-    }
-    return result;
+    return this.replace(pattern, function() {
+      var match = $A(arguments);
+      match.input = match.pop();
+      match.index = match.pop();
+      return String.interpret(replacement(match));
+    });
   }
 
   /**
