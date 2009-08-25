@@ -29,7 +29,14 @@ new Test.Unit.Runner({
       source.gsub(/o+/, function(match) {
         return match[0].length % 2;
       }));
-
+    this.assertEqual('f1 b5 b9z',
+      source.gsub(/o+/, function(match) {
+        return match.index;
+      }));
+    this.assertEqual('foo boo bofoo boo boz',
+      source.gsub(/.$/, function(match) {
+        return match.input;
+      }));
   },
   
   testGsubWithReplacementString: function() {
@@ -109,6 +116,20 @@ new Test.Unit.Runner({
       source.sub(/[^o]+/, '-#{0}-'));
     this.assertEqual('-f-oo- b-oo boz',
       source.sub(/[^o]+/, '-#{0}-', 2));
+  },
+  
+  testSubstitutionEdgeCases: function() {
+    var source = 'foo boo boz';
+    
+    this.assertEqual('barfbarobarobar barbbarobarobar barbbarobarzbar',
+      source.gsub('', 'bar'), 'empty string');
+    this.assertEqual('barfbarobarobar barbbarobarobar barbbarobarzbar',
+      source.gsub(/|/, 'bar'), 'regexp that matches empty string');
+    
+    this.assertEqual('f-- b-- boz',
+      source.gsub(/oo/g, '--'), 'gsub with global flag');
+    this.assertEqual('f-- boo boz',
+      source.sub(/oo/g, '--'), 'sub with global flag');
   },
   
   testScan: function() {
