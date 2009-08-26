@@ -979,6 +979,11 @@ new Test.Unit.Runner({
     
     this.assertEqual("alert('hello world');", $('attributes_with_issues_1').readAttribute('onclick'));
     this.assertNull($('attributes_with_issues_1').readAttribute('onmouseover'));
+    
+    this.assertEqual("if (e) { alert('foo'); }", $('attributes_with_issues_1').readAttribute('onfocus'));
+    
+    $('attributes_with_issues_1').writeAttribute('onclick', 'foo');
+    this.assertEqual('foo', $('attributes_with_issues_1').readAttribute('onclick'));
    
     this.assertEqual('date', $('attributes_with_issues_type').readAttribute('type'));
     this.assertEqual('text', $('attributes_with_issues_readonly').readAttribute('type'));

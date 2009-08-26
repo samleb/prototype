@@ -1400,14 +1400,13 @@ else if (Prototype.Browser.IE) {
             var f;
 
             // IE<8
-            if (String(value).indexOf('{') > -1) {
+            if (Object.isFunction(value)) {
               // intrinsic event attributes are serialized as `function { ... }`
               f = function(element, attribute) {
                 attribute = element.getAttribute(attribute);
                 if (!attribute) return null;
-                attribute = attribute.toString();
-                attribute = attribute.split('{')[1];
-                attribute = attribute.split('}')[0];
+                if (Object.isFunction(attribute))
+                  attribute = attribute.toString().split(/^function[^\{]*\{|\}$/).join('');
                 return attribute.strip();
               };
             }
