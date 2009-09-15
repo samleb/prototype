@@ -617,6 +617,7 @@ new Test.Unit.Runner({
     this.assertEqual('<ul id="navigation_test">', $('navigation_test').inspect());
     this.assertEqual('<li class="first">', $('navigation_test').down().inspect());
     this.assertEqual('<em>', $('navigation_test').down(1).inspect());
+    this.assertEqual('Element', Element.inspect());
   },
   
   testElementMakeClipping: function() {

@@ -751,6 +751,7 @@ var Enumerable = (function() {
    *  Returns the debug-oriented string representation of the object.
   **/
   function inspect() {
+    if (this === Enumerable) return 'Enumerable';
     return '#<Enumerable:' + this.toArray().inspect() + '>';
   }
 

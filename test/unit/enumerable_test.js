@@ -267,5 +267,16 @@ new Test.Unit.Runner({
     this.assertEqual(4, Fixtures.Nicknames.size());
     this.assertEqual(26, Fixtures.Primes.size());
     this.assertEqual(0, [].size());
+  },
+  
+  testInspect: function() {
+    var enumerable = Object.extend({
+      _each: function(iterator) {
+        iterator('foo');
+        iterator('bar');
+      }
+    }, Enumerable);
+    this.assertEqual("#<Enumerable:['foo', 'bar']>", enumerable.inspect());
+    this.assertEqual('Enumerable', Enumerable.inspect());
   }
 });

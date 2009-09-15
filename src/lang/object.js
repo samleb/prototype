@@ -46,6 +46,7 @@
     try {
       if (isUndefined(object)) return 'undefined';
       if (object === null) return 'null';
+      if (object === Object) return 'Object';
       return object.inspect ? object.inspect() : String(object);
     } catch (e) {
       if (e instanceof RangeError) return '...';

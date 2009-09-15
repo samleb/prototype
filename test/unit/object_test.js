@@ -30,6 +30,7 @@ new Test.Unit.Runner({
     this.assertEqual('null', Object.inspect(null));
     this.assertEqual("'foo\\\\b\\\'ar'", Object.inspect('foo\\b\'ar'));
     this.assertEqual('[]', Object.inspect([]));
+    this.assertEqual('Object', Object.inspect(Object));
     this.assertNothingRaised(function() { Object.inspect(window.Node) });
   },
 

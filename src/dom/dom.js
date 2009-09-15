@@ -400,6 +400,7 @@ Element.Methods = {
    *  Returns the debug-oriented string representation of `element`.
   **/
   inspect: function(element) {
+    if (this === Element) return 'Element';
     element = $(element);
     var result = '<' + element.tagName.toLowerCase();
     $H({'id': 'id', 'className': 'class'}).each(function(pair) {
