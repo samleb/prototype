@@ -789,8 +789,8 @@
   var timer;
 
   function fireContentLoadedEvent() {
-    if (document.loaded) return;
     if (timer) window.clearTimeout(timer);
+    if (document.loaded) return;
     document.loaded = true;
     document.fire('dom:loaded');
   }
