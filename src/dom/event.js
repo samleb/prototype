@@ -330,21 +330,19 @@
         // If we're dealing with mouseenter or mouseleave in a non-IE browser,
         // we create a custom responder that mimics their behavior within
         // mouseover and mouseout.
-        if (eventName === "mouseenter" || eventName === "mouseleave") {
-          responder = function(event) {
-            Event.extend(event, element);
+        responder = function(event) {
+          Event.extend(event, element);
 
-            var parent = event.relatedTarget;
-            while (parent && parent !== element) {
-              try { parent = parent.parentNode; }
-              catch(e) { parent = element; }
-            }
+          var parent = event.relatedTarget;
+          while (parent && parent !== element) {
+            try { parent = parent.parentNode; }
+            catch(e) { parent = element; }
+          }
 
-            if (parent === element) return;
+          if (parent === element) return;
 
-            handler.call(element, event);
-          };
-        }
+          handler.call(element, event);
+        };
       } else {
         responder = function(event) {
           Event.extend(event, element);
