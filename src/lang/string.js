@@ -28,6 +28,8 @@ Object.extend(String, {
   }
 });
 
+Object.extend(String.prototype, NativeComparable);
+
 Object.extend(String.prototype, (function() {
 
   function prepareReplacement(replacement) {

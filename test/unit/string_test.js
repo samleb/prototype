@@ -14,6 +14,22 @@ new Test.Unit.Runner({
     this.assertIdentical('', String.interpret(''));
   },
 
+  testEquals: function() {
+    this.assert("foo".equals("foo"));
+    this.assert(!"foo".equals("bar"));
+    this.assert("foo".equals(new String("foo")));
+    this.assert(new String("foo").equals("foo"));
+    this.assert(!"1".equals(1));
+  },
+
+  testCompareTo: function() {
+    this.assert("bar".compareTo("foo") < 0);
+    this.assertEqual(0, "foo".compareTo("foo"));
+    this.assert("foo".compareTo("bar") > 0);
+    this.assert("abc".compareTo("z") < 0);
+    this.assert("z".compareTo("abc") > 0);
+  },
+
   testGsubWithReplacementFunction: function() {
     var source = 'foo boo boz';
     

@@ -10,6 +10,46 @@ new Test.Unit.Runner({
     }, this);
   },
 
+  testNumberEquals: function() {
+    this.assert((Math.PI).equals(Math.PI));
+    this.assert((Math.PI).equals(new Number(Math.PI)));
+    this.assert(new Number(Math.PI).equals(Math.PI));
+    this.assert(new Number(Math.PI).equals(new Number(Math.PI)));
+    this.assert(!(1).equals(0));
+    this.assert(!(1).equals("1"));
+    this.assert(Infinity.equals(Infinity));
+    this.assert(!Infinity.equals(-Infinity));
+    this.assert(!(-Infinity).equals(Infinity));
+    this.assert(NaN.equals(NaN));
+  },
+
+  testCompareTo: function() {
+    // These 2 commented assertions are equivalent to the whole list below
+    // but they suppose that `Object.compare` and `Array#equals` work as expected.
+    // They also don't show explicitely that we're testing `Number#compareTo`.
+    
+    // this.assert([-Infinity, -1, 0, Math.PI, Infinity, NaN].equals([0, Infinity, Math.PI, -1,  NaN, -Infinity].sort(Object.compare)));
+    // this.assertEqual(0, NaN.compareTo(NaN));
+    
+    this.assert((0).compareTo(1) < 0);
+    this.assertEqual(0, (Math.PI).compareTo(Math.PI));
+    this.assert((1).compareTo(0) > 0);
+    
+    this.assert((-Infinity).compareTo(0) < 0);
+    this.assert((-Infinity).compareTo(Infinity) < 0);
+    this.assertEqual(0, Infinity.compareTo(Infinity));
+    this.assert(Infinity.compareTo(0) > 0);
+    this.assert(Infinity.compareTo(-Infinity) > 0);
+    
+    // `NaN` is equal to itself but considered greater than any other value
+    // so the order is total.
+    this.assertEqual(0, NaN.compareTo(NaN));
+    this.assert(NaN.compareTo(-Infinity) > 0);
+    this.assert((-Infinity).compareTo(NaN) < 0);
+    this.assert(NaN.compareTo(Infinity) > 0);
+    this.assert(Infinity.compareTo(NaN) < 0);
+  },
+
   testNumberToColorPart: function() {
     this.assertEqual('00', (0).toColorPart());
     this.assertEqual('0a', (10).toColorPart());

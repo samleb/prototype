@@ -41,6 +41,15 @@ var Hash = Class.create(Enumerable, (function() {
     this._object = Object.isHash(object) ? object.toObject() : Object.clone(object);
   }
 
+  function equals(other) {
+    return this === other
+      || Object.isHash(other)
+      && this.keys().length === other.keys().length
+      && this.all(function(pair) {
+           return Object.equal(pair.value, other.get(pair.key));
+         });
+  }
+
   // Docs for #each even though technically it's implemented by Enumerable
   /**
    *  Hash#each(iterator[, context]) -> Hash
@@ -358,6 +367,7 @@ var Hash = Class.create(Enumerable, (function() {
 
   return {
     initialize:             initialize,
+    equals:                 equals,
     _each:                  _each,
     set:                    set,
     get:                    get,

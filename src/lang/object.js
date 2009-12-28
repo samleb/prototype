@@ -26,6 +26,22 @@
     return destination;
   }
 
+  function equal(a, b) {
+    if (a === b) return true;
+    if (a == null || b == null) return a == b;
+    if (a.equals) return a.equals(b);
+    if (b.equals) return b.equals(a);
+    return false;
+  }
+
+  function compare(a, b) {
+    if (a === b) return 0;
+    if (a == null || b == null) return a == b ? 0 : null;
+    if (a.compareTo) return a.compareTo(b);
+    if (b.compareTo) return -(b.compareTo(a));
+    return null;
+  }
+
   /**
    *  Object.inspect(object) -> String
    *  - object (Object): The item to be inspected.
@@ -278,6 +294,8 @@
 
   extend(Object, {
     extend:        extend,
+    equal:         equal,
+    compare:       compare,
     inspect:       inspect,
     toJSON:        toJSON,
     toQueryString: toQueryString,

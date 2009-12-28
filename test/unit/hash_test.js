@@ -1,4 +1,38 @@
 new Test.Unit.Runner({
+  testEquals: function() {
+    this.assert($H().equals($H()));
+    this.assert(!$H().equals(null));
+    this.assert(!$H().equals());
+    this.assert(!$H().equals({}));
+    this.assert(!$H().equals([]));
+    
+    // one key
+    this.assert($H({a: 'A'}).equals($H({a: 'A'})));
+    
+    // same key, different values, symmetric
+    this.assert(!$H({a: 'A'}).equals($H({a: 'X'})));
+    this.assert(!$H({a: 'X'}).equals($H({a: 'A'})));
+    
+    // same value, different keys, symmetric
+    this.assert(!$H({a: 'A'}).equals($H({x: 'A'})));
+    this.assert(!$H({x: 'A'}).equals($H({a: 'A'})));
+    
+    // several keys
+    this.assert($H({a: 'A', b: 'B'}).equals($H({a: 'A', b: 'B'})));
+    
+    // same keys, different values, symmetric
+    this.assert(!$H({a: 'A', b: 'B'}).equals($H({a: 'A', b: 'X'})));
+    this.assert(!$H({a: 'A', b: 'X'}).equals($H({a: 'A', b: 'B'})));
+
+    // same values, different keys, symmetric
+    this.assert(!$H({a: 'A', b: 'B'}).equals($H({a: 'A', x: 'B'})));
+    this.assert(!$H({a: 'A', x: 'B'}).equals($H({a: 'A', b: 'B'})));
+
+    // different number of keys, symmetric
+    this.assert(!$H({a: 'A'}).equals($H({a: 'A', b: 'B'})));
+    this.assert(!$H({a: 'A', b: 'B'}).equals($H({a: 'A'})));
+  },
+  
   testSet: function() {
     var h = $H({a: 'A'})
 

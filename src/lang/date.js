@@ -18,6 +18,8 @@
  *      d.toJSON();
  *      //-> '"1969-12-31T16:00:00Z"'
 **/
+Object.extend(Date.prototype, NativeComparable);
+
 Date.prototype.toJSON = function() {
   return '"' + this.getUTCFullYear() + '-' +
     (this.getUTCMonth() + 1).toPaddedString(2) + '-' +

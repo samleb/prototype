@@ -123,6 +123,24 @@ Array.from = $A;
       slice = arrayProto.slice,
       _each = arrayProto.forEach; // use native browser JS 1.6 implementation if available
 
+  function equals(other) {
+    return this === other
+      || Object.isArray(other)
+      && this.length === other.length
+      && this.all(function(value, index) {
+           return Object.equal(value, other[index]);
+         });
+  }
+
+  function compareTo(other) {
+    if (!Object.isArray(other)) return null;
+    for (var i = 0, l = Math.max(this.length, other.length); i < l; i++) {
+      var comparison = Object.compare(this[i], other[i]);
+      if (comparison) return comparison;
+    }
+    return this.length - other.length;
+  }
+
   function each(iterator) {
     for (var i = 0, length = this.length; i < length; i++)
       iterator(this[i]);
@@ -414,11 +432,14 @@ Array.from = $A;
   }
 
   Object.extend(arrayProto, Enumerable);
+  Object.extend(arrayProto, Comparable);
 
   if (!arrayProto._reverse)
     arrayProto._reverse = arrayProto.reverse;
 
   Object.extend(arrayProto, {
+    equals:    equals,
+    compareTo: compareTo,
     _each:     _each,
     clear:     clear,
     first:     first,

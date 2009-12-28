@@ -60,11 +60,10 @@ var ObjectRange = Class.create(Enumerable, (function() {
    *  Determines whether the value is included in the range.
   **/
   function include(value) {
-    if (value < this.start)
+    if (Object.compare(value, this.start) < 0)
       return false;
-    if (this.exclusive)
-      return value < this.end;
-    return value <= this.end;
+    var comparison = Object.compare(value, this.end);
+    return this.exclusive ? comparison < 0 : comparison <= 0;
   }
 
   return {

@@ -9,6 +9,47 @@ new Test.Unit.Runner({
       Object.extend(object, {bla: null}));
   },
 
+  testObjectEqual: function() {
+    var object = {};
+    
+    this.assert(!Object.equal({}, {}));
+    this.assert(Object.equal(object, object));
+    this.assert(Object.equal(null, undefined));
+    this.assert(Object.equal(undefined, null));
+    
+    var returnValue = {};
+    object = {
+      equals: function(other) {
+        return returnValue;
+      }
+    };
+    
+    this.assertIdentical(returnValue, Object.equal(object, {}));
+    this.assertIdentical(returnValue, Object.equal({}, object));
+    this.assert(!Object.equal(object, null));
+    this.assert(!Object.equal(null, object));
+  },
+
+  testObjectCompare: function() {
+    var object = {};
+    
+    this.assertNull(Object.compare({}, {}));
+    this.assertEqual(0, Object.compare(object, object));
+    this.assertEqual(0, Object.compare(null, undefined));
+    this.assertEqual(0, Object.compare(undefined, null));
+    
+    object = {
+      compareTo: function(other) {
+        return 42;
+      }
+    };
+    
+    this.assertEqual(42, Object.compare(object, {}));
+    this.assertEqual(-42, Object.compare({}, object));
+    this.assertNull(Object.compare(object, null));
+    this.assertNull(Object.compare(null, object));
+  },
+
   testObjectToQueryString: function() {
     this.assertEqual('a=A&b=B&c=C&d=D%23', Object.toQueryString({a: 'A', b: 'B', c: 'C', d: 'D#'}));
   },

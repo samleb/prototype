@@ -12,7 +12,22 @@
  *  * Instance-method aliases of many functions in the `Math` namespace.
  *
 **/
+Object.extend(Number.prototype, NativeComparable);
+
 Object.extend(Number.prototype, (function() {
+  var _equals = NativeComparable.equals,
+      _compareTo = NativeComparable.compareTo;
+
+  function equals(other) {
+    return _equals.call(this, other) || isNaN(this) && isNaN(other);
+  }
+
+  function compareTo(other) {
+    if (isNaN(this))  return isNaN(other) ? 0 : 1;
+    if (isNaN(other)) return isNaN(this)  ? 0 : -1;
+    return _compareTo.call(this, other);
+  }
+
   /**
    *  Number#toColorPart() -> String
    *
@@ -155,6 +170,8 @@ Object.extend(Number.prototype, (function() {
   }
 
   return {
+    equals:         equals,
+    compareTo:      compareTo,
     toColorPart:    toColorPart,
     succ:           succ,
     times:          times,

@@ -43,6 +43,30 @@ new Test.Unit.Runner({
     this.assertEnumEqual([], $A(true));
   },
   
+  testEquals: function() {
+    this.assert([].equals([]));
+    this.assert(![].equals(null));
+    this.assert(![].equals());
+    this.assert(![].equals({}));
+    this.assert([1].equals([1]));
+    this.assert(![1].equals([2]));
+    this.assert([1, 2].equals([1, 2]));
+    this.assert(![1, 2].equals([2, 1]));
+    this.assert(![1].equals([1, 2]));
+    this.assert(![1, 2].equals([1]));
+    // TODO: assert that `equals` delegates to `Object.equal`.
+  },
+  
+  testCompareTo: function() {
+    this.assertEqual(0, [].compareTo([]));
+    this.assertEqual(0, [1].compareTo([1]));
+    this.assert([1].compareTo([1, 2]) < 0);
+    this.assert([1, 2].compareTo([1]) > 0);
+    this.assert([2].compareTo([1, 2]) > 0);
+    this.assert([1, 2].compareTo([2]) < 0);
+    // TODO: assert that `compareTo` delegates to `Object.compare`.
+  },
+  
   testClear: function(){
     this.assertEnumEqual([], [].clear());
     this.assertEnumEqual([], [1].clear());
