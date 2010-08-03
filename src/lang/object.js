@@ -32,11 +32,20 @@
       NUMBER_CLASS = '[object Number]',
       STRING_CLASS = '[object String]',
       ARRAY_CLASS = '[object Array]',
-      NATIVE_JSON_STRINGIFY_SUPPORT = window.JSON &&
-        typeof JSON.stringify === 'function' &&
-        JSON.stringify(0) === '0' &&
-        typeof JSON.stringify(Prototype.K) === 'undefined';
-        
+      NATIVE_JSON_STRINGIFY_SUPPORT = (function() {
+        var isSupported = false;
+        if (window.JSON && typeof JSON.stringify === 'function') {
+          var el = extend(document.createElement('DIV'), {
+            toJSON: function() { return 1; }
+          });
+          isSupported = JSON.stringify(0) === '0' &&
+                        JSON.stringify(Prototype.K) === 'undefined' &&
+                        JSON.stringify(el) === '1';
+          el = null;
+        }
+        return isSupported;
+      })();
+  
   function Type(o) {
     switch(o) {
       case null: return NULL_TYPE;

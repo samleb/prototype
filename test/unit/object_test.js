@@ -69,6 +69,7 @@ new Test.Unit.Runner({
     var element = $('test');
     element.toJSON = function(){return 'I\'m a div with id test'};
     this.assertEqual('"I\'m a div with id test"', Object.toJSON(element));
+    this.assertEqual('{"foo":"I\'m a div with id test"}', Object.toJSON({foo: element}));
   },
 
   testObjectToHTML: function() {
